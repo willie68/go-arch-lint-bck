@@ -4,11 +4,58 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/fe3dback/go-arch-lint/internal/models"
 	"github.com/fe3dback/go-arch-lint/internal/services/project/scanner"
 )
+
+// TestScan_IgnoresUnstatableOutOfScopeFile covers a directory that can be listed
+// but whose entries cannot be stat'ed (mode 0o400: read, no search). The files
+// inside are out of scope anyway (not ".go"), so the scan must not care about
+// them. Walking with filepath.Walk stat'ed every entry before the scope check
+// and aborted the whole scan on the first permission error; walking with
+// filepath.WalkDir never stats out-of-scope entries.
+func TestScan_IgnoresUnstatableOutOfScopeFile(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("directory permissions do not restrict stat on windows")
+	}
+	if os.Geteuid() == 0 {
+		t.Skip("running as root bypasses directory permissions; cannot simulate an unstatable entry")
+	}
+
+	projectDir := t.TempDir()
+
+	goFile := filepath.Join(projectDir, "main.go")
+	if err := os.WriteFile(goFile, []byte("package main\n"), 0o600); err != nil {
+		t.Fatalf("write source file: %v", err)
+	}
+
+	// Not excluded in the config: the walk descends into it and lists it fine,
+	// but stat'ing what it contains is denied.
+	unsearchableDir := filepath.Join(projectDir, "assets")
+	if err := os.Mkdir(unsearchableDir, 0o755); err != nil {
+		t.Fatalf("mkdir dir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(unsearchableDir, ".env"), []byte("SECRET=1\n"), 0o600); err != nil {
+		t.Fatalf("write out of scope file: %v", err)
+	}
+	if err := os.Chmod(unsearchableDir, 0o400); err != nil {
+		t.Fatalf("chmod dir: %v", err)
+	}
+	// Restore perms so t.TempDir cleanup can remove it.
+	t.Cleanup(func() { _ = os.Chmod(unsearchableDir, 0o755) })
+
+	files, err := scanner.NewScanner().Scan(context.Background(), projectDir, "example.com/proj", nil, nil)
+	if err != nil {
+		t.Fatalf("scan should ignore the unstatable out of scope file, got error: %v", err)
+	}
+
+	if len(files) != 1 || files[0].Path != goFile {
+		t.Fatalf("expected only %q to be scanned, got %+v", goFile, files)
+	}
+}
 
 // TestScan_SkipsUnreadableExcludedDir reproduces the case where an excluded
 // directory inside the project tree is unreadable (e.g. a root-owned local
