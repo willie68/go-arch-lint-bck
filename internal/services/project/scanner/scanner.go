@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -67,8 +68,11 @@ func (r *Scanner) Scan(
 		results:  []models.ProjectFile{},
 	}
 
-	err := filepath.Walk(rctx.projectDirectory, func(path string, info os.FileInfo, err error) error {
-		return r.resolveFile(&rctx, path, info, err)
+	// WalkDir is used over Walk: it never stats the entries it yields, so an
+	// entry that cannot be stat'ed does not abort the walk before the scope
+	// check has a chance to skip it.
+	err := filepath.WalkDir(rctx.projectDirectory, func(path string, d fs.DirEntry, err error) error {
+		return r.resolveFile(&rctx, path, d, err)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to walk project tree: %w", err)
@@ -77,12 +81,12 @@ func (r *Scanner) Scan(
 	return rctx.results, nil
 }
 
-func (r *Scanner) resolveFile(ctx *resolveContext, path string, info os.FileInfo, err error) error {
+func (r *Scanner) resolveFile(ctx *resolveContext, path string, d fs.DirEntry, err error) error {
 	if err != nil {
 		return err
 	}
 
-	if info.IsDir() {
+	if d.IsDir() {
 		// Skip descending into excluded directories entirely.
 		if r.isExcludedDir(ctx, path) {
 			return filepath.SkipDir

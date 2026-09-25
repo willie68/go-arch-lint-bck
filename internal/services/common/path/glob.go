@@ -1,7 +1,7 @@
 package path
 
 import (
-	"os"
+	"io/fs"
 	"path/filepath"
 	"strings"
 )
@@ -41,7 +41,7 @@ func (globs globs) expand() ([]string, error) {
 				return nil, err
 			}
 			for _, path := range paths {
-				err = filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
+				err = filepath.WalkDir(path, func(path string, _ fs.DirEntry, err error) error {
 					if err != nil {
 						return err
 					}

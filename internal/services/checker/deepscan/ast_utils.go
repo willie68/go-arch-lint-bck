@@ -5,7 +5,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	"os"
+	"io/fs"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -81,8 +81,11 @@ func parseRecursive(
 		foundFiles:           map[string]struct{}{},
 	}
 
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		return resolveScopeFile(&parseCtx, path, info, err)
+	// WalkDir is used over Walk: it never stats the entries it yields, so an
+	// entry that cannot be stat'ed does not abort the walk before the scope
+	// check has a chance to skip it.
+	err := filepath.WalkDir(path, func(path string, d fs.DirEntry, err error) error {
+		return resolveScopeFile(&parseCtx, path, d, err)
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to walk project tree: %w", err)
@@ -100,7 +103,7 @@ func parseRecursive(
 	return files, nil
 }
 
-func resolveScopeFile(ctx *parseRecursiveCtx, path string, info os.FileInfo, err error) error {
+func resolveScopeFile(ctx *parseRecursiveCtx, path string, d fs.DirEntry, err error) error {
 	if err != nil {
 		return err
 	}
@@ -109,7 +112,7 @@ func resolveScopeFile(ctx *parseRecursiveCtx, path string, info os.FileInfo, err
 		return nil
 	}
 
-	if info.IsDir() || !inScope(ctx, path) {
+	if d.IsDir() || !inScope(ctx, path) {
 		return nil
 	}
 
