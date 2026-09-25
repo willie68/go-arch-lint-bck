@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/fe3dback/go-arch-lint/internal/models"
+	"github.com/willie68/go-arch-lint/internal/models"
 )
 
 const (
@@ -27,7 +27,7 @@ func (f fakePathResolver) Resolve(_ string) ([]string, error) {
 	return resolved, nil
 }
 
-// see: https://github.com/fe3dback/go-arch-lint/issues/79
+// see: https://github.com/willie68/go-arch-lint/issues/79
 // glob matches are os specific ('C:\app\internal\pkg' on windows), but
 // ImportPath/LocalPath is a part of go import path, and always use '/'.
 func Test_resolveLocalGlobPath(t *testing.T) {

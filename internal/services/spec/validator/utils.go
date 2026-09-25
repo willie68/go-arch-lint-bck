@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"slices"
 
-	"github.com/fe3dback/go-arch-lint/internal/services/spec"
+	"github.com/willie68/go-arch-lint/internal/services/spec"
 )
 
 type (

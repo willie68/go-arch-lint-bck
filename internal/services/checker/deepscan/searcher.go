@@ -12,8 +12,8 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"github.com/fe3dback/go-arch-lint/internal/models"
-	astUtil "github.com/fe3dback/go-arch-lint/internal/services/common/ast"
+	"github.com/willie68/go-arch-lint/internal/models"
+	astUtil "github.com/willie68/go-arch-lint/internal/services/common/ast"
 )
 
 type (

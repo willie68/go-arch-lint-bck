@@ -5,8 +5,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/fe3dback/go-arch-lint/internal/models"
-	"github.com/fe3dback/go-arch-lint/internal/operations/schema"
+	"github.com/willie68/go-arch-lint/internal/models"
+	"github.com/willie68/go-arch-lint/internal/operations/schema"
 )
 
 func (c *Container) commandSchema() (*cobra.Command, runner) {
