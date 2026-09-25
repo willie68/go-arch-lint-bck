@@ -8,6 +8,10 @@ import (
 	"github.com/fe3dback/go-arch-lint/internal/models"
 )
 
+const (
+	appDirectory = "/app"
+)
+
 // fakePathResolver returns paths in os specific form, exactly like
 // filepath.Glob/filepath.Walk do inside real path.Resolver.
 type fakePathResolver struct {
@@ -37,7 +41,7 @@ func Test_resolveLocalGlobPath(t *testing.T) {
 	}{
 		{
 			name:          "nested glob match",
-			rootDirectory: "/app",
+			rootDirectory: appDirectory,
 			matches:       []string{"/app/internal/services/checker"},
 			want: []models.ResolvedPath{
 				{
@@ -49,7 +53,7 @@ func Test_resolveLocalGlobPath(t *testing.T) {
 		},
 		{
 			name:          "root itself",
-			rootDirectory: "/app",
+			rootDirectory: appDirectory,
 			matches:       []string{"/app"},
 			want: []models.ResolvedPath{
 				{
@@ -61,7 +65,7 @@ func Test_resolveLocalGlobPath(t *testing.T) {
 		},
 		{
 			name:          "trailing separator in match",
-			rootDirectory: "/app",
+			rootDirectory: appDirectory,
 			matches:       []string{"/app/internal/"},
 			want: []models.ResolvedPath{
 				{
