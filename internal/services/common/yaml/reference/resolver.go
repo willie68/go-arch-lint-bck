@@ -1,13 +1,14 @@
 package reference
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 
 	"github.com/fe3dback/go-yaml"
 	"github.com/fe3dback/go-yaml/parser"
 
-	"github.com/fe3dback/go-arch-lint/internal/models/common"
+	"github.com/willie68/go-arch-lint/internal/models/common"
 )
 
 type Resolver struct {
@@ -63,6 +64,11 @@ func (r *Resolver) fileSource(filePath string) []byte {
 	if err != nil {
 		panic(fmt.Sprintf("failed to provide source code of archfile: %v", err))
 	}
+
+	// archfile written on windows usually has CRLF line endings, yaml parser
+	// count '\r' as part of line and return shifted line/column,
+	// so all notices will point to wrong place of archfile
+	content = bytes.ReplaceAll(content, []byte("\r\n"), []byte("\n"))
 
 	r.cache[filePath] = content
 	return content

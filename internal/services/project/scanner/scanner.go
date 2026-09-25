@@ -14,8 +14,8 @@ import (
 
 	"golang.org/x/tools/go/packages"
 
-	"github.com/fe3dback/go-arch-lint/internal/models"
-	astUtil "github.com/fe3dback/go-arch-lint/internal/services/common/ast"
+	"github.com/willie68/go-arch-lint/internal/models"
+	astUtil "github.com/willie68/go-arch-lint/internal/services/common/ast"
 )
 
 type (
@@ -123,8 +123,12 @@ func (r *Scanner) inScope(ctx *resolveContext, path string) bool {
 		}
 	}
 
+	// excludeFiles regexp's are written by user in unix form ('^.*/test/.*$'),
+	// so they never match windows path with backslash separator
+	unixPath := filepath.ToSlash(path)
+
 	for _, matcher := range ctx.excludeFileMatchers {
-		if matcher.Match([]byte(path)) {
+		if matcher.Match([]byte(unixPath)) {
 			return false
 		}
 	}

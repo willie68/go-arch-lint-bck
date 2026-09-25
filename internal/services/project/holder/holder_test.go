@@ -1,12 +1,13 @@
 package holder
 
 import (
+	"path/filepath"
 	"reflect"
 	"testing"
 
-	"github.com/fe3dback/go-arch-lint/internal/models"
-	"github.com/fe3dback/go-arch-lint/internal/models/arch"
-	"github.com/fe3dback/go-arch-lint/internal/models/common"
+	"github.com/willie68/go-arch-lint/internal/models"
+	"github.com/willie68/go-arch-lint/internal/models/arch"
+	"github.com/willie68/go-arch-lint/internal/models/common"
 )
 
 const (
@@ -193,7 +194,12 @@ func Test_componentsMatchesFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := componentsMatchesFile(tt.args.filePath, tt.args.components); !reflect.DeepEqual(got, tt.want) {
+			// componentsMatchesFile use filepath.Dir inside, so both file and component
+			// paths should be in os specific form (test cases are written in unix form)
+			filePath := filepath.FromSlash(tt.args.filePath)
+			components := osSpecificComponents(tt.args.components)
+
+			if got := componentsMatchesFile(filePath, components); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("componentsMatchesFile() = %v, want %v", got, tt.want)
 			}
 		})
@@ -290,4 +296,22 @@ func Test_compare(t *testing.T) {
 			}
 		})
 	}
+}
+
+func osSpecificComponents(components []arch.Component) []arch.Component {
+	result := make([]arch.Component, 0, len(components))
+
+	for _, component := range components {
+		paths := make([]common.Referable[models.ResolvedPath], 0, len(component.ResolvedPaths))
+
+		for _, resolvedPath := range component.ResolvedPaths {
+			resolvedPath.Value.AbsPath = filepath.FromSlash(resolvedPath.Value.AbsPath)
+			paths = append(paths, resolvedPath)
+		}
+
+		component.ResolvedPaths = paths
+		result = append(result, component)
+	}
+
+	return result
 }

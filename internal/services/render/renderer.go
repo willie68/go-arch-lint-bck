@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/fe3dback/go-arch-lint/internal/models"
+	"github.com/willie68/go-arch-lint/internal/models"
 )
 
 const (

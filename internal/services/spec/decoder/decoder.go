@@ -8,9 +8,9 @@ import (
 
 	"github.com/fe3dback/go-yaml"
 
-	"github.com/fe3dback/go-arch-lint/internal/models/arch"
-	"github.com/fe3dback/go-arch-lint/internal/models/common"
-	"github.com/fe3dback/go-arch-lint/internal/services/spec"
+	"github.com/willie68/go-arch-lint/internal/models/arch"
+	"github.com/willie68/go-arch-lint/internal/models/common"
+	"github.com/willie68/go-arch-lint/internal/services/spec"
 )
 
 type Decoder struct {
@@ -33,6 +33,11 @@ func (sp *Decoder) Decode(archFile string) (spec.Document, []arch.Notice, error)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to provide source code of archfile: %w", err)
 	}
+
+	// archfile written on windows usually has CRLF line endings, yaml parser
+	// count '\r' as part of line and return shifted line/column,
+	// so all notices will point to wrong place of archfile
+	sourceCode = bytes.ReplaceAll(sourceCode, []byte("\r\n"), []byte("\n"))
 
 	// read only doc Version
 	documentVersion, err := sp.readVersion(sourceCode)
