@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/willie68/go-arch-lint/internal/app/internal/container"
-	"github.com/willie68/go-arch-lint/internal/models"
+	"github.com/fe3dback/go-arch-lint/internal/app/internal/container"
+	"github.com/fe3dback/go-arch-lint/internal/models"
 )
 
 func Execute() int {

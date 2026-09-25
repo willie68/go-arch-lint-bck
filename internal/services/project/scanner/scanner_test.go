@@ -7,8 +7,8 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/willie68/go-arch-lint/internal/models"
-	"github.com/willie68/go-arch-lint/internal/services/project/scanner"
+	"github.com/fe3dback/go-arch-lint/internal/models"
+	"github.com/fe3dback/go-arch-lint/internal/services/project/scanner"
 )
 
 // TestScan_IgnoresUnstatableOutOfScopeFile covers a directory that can be listed

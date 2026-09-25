@@ -22,8 +22,12 @@ func glob(pattern string) ([]string, error) {
 	split := strings.Split(pattern, "**")
 	for i, s := range split {
 		// pattern can mix separators on windows, because glob mask comes from
-		// archfile in unix form ('a/b/**'), but project root is os specific
-		split[i] = strings.TrimRight(s, "/"+string(filepath.Separator))
+		// archfile in unix form ('a/b/**'), but project root is os specific.
+		// Trim both forms without a cutset: on Unix Separator is already '/',
+		// so "/"+Separator would be "//" and fail staticcheck SA1024.
+		split[i] = strings.TrimRightFunc(s, func(r rune) bool {
+			return r == '/' || r == filepath.Separator
+		})
 	}
 
 	return globs(split).expand()

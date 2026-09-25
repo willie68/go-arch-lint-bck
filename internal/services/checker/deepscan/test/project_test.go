@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/willie68/go-arch-lint/internal/services/checker/deepscan"
+	"github.com/fe3dback/go-arch-lint/internal/services/checker/deepscan"
 )
 
 func Test1(t *testing.T) {

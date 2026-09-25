@@ -1,3 +1,3 @@
-module github.com/willie68/go-arch-lint/test/check/project
+module github.com/fe3dback/go-arch-lint/test/check/project
 
 go 1.13

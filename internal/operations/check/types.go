@@ -3,9 +3,9 @@ package check
 import (
 	"context"
 
-	"github.com/willie68/go-arch-lint/internal/models"
-	"github.com/willie68/go-arch-lint/internal/models/arch"
-	"github.com/willie68/go-arch-lint/internal/models/common"
+	"github.com/fe3dback/go-arch-lint/internal/models"
+	"github.com/fe3dback/go-arch-lint/internal/models/arch"
+	"github.com/fe3dback/go-arch-lint/internal/models/common"
 )
 
 type (

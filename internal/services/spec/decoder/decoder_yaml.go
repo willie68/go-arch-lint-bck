@@ -6,7 +6,7 @@ import (
 
 	"github.com/fe3dback/go-yaml/ast"
 
-	"github.com/willie68/go-arch-lint/internal/models/common"
+	"github.com/fe3dback/go-arch-lint/internal/models/common"
 )
 
 type ref[T any] struct {

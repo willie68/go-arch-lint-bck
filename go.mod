@@ -1,4 +1,4 @@
-module github.com/willie68/go-arch-lint
+module github.com/fe3dback/go-arch-lint
 
 go 1.25.0
 
